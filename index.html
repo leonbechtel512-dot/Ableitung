@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mathe Entdecker: Ableitungsregeln</title>
     
-    <!-- Tailwind CSS -->
+    <!-- 1. Tailwind CSS für das Design laden -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- React & ReactDOM -->
+    <!-- 2. React (Das Gehirn der App) laden -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel für JSX -->
+    <!-- 3. Babel (Der Übersetzer für den Browser) laden -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        /* Zusätzliche Animationen, die Tailwind standardmäßig nicht hat */
+        /* Spezial-Animationen */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -29,25 +29,16 @@
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans selection:bg-blue-200">
 
+    <!-- Hier wird die App "hineingeladen" -->
     <div id="root"></div>
 
+    <!-- Hier beginnt der eigentliche Programmcode -->
     <script type="text/babel">
         const { useState } = React;
 
-        // --- ICONS (SVG Komponenten als Ersatz für lucide-react) ---
+        // --- ICONS (Wir bauen die Icons direkt hier, damit keine Importe nötig sind) ---
         const IconBase = ({ size = 24, className = "", children }) => (
-            <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                width={size} 
-                height={size} 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                className={className}
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
                 {children}
             </svg>
         );
@@ -62,7 +53,7 @@
         const ArrowRight = (props) => <IconBase {...props}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></IconBase>;
 
 
-        // --- HAUPTAPP ---
+        // --- DIE APP LOGIK ---
         const App = () => {
             const [activeTab, setActiveTab] = useState('intro');
             const [revealedRows, setRevealedRows] = useState([]);
@@ -70,7 +61,6 @@
             const [quizScore, setQuizScore] = useState(0);
             const [quizAnswers, setQuizAnswers] = useState({});
 
-            // Navigation Logic
             const tabs = [
                 { id: 'intro', label: 'Start', icon: <Search size={20} /> },
                 { id: 'discovery', label: 'Entdecken', icon: <Brain size={20} /> },
@@ -78,7 +68,6 @@
                 { id: 'practice', label: 'Üben', icon: <Calculator size={20} /> }
             ];
 
-            // Data for Discovery Phase
             const discoveryData = [
                 { func: "f(x) = x²", deriv: "f'(x) = 2x¹", note: "Die 2 wandert vor das x." },
                 { func: "f(x) = x³", deriv: "f'(x) = 3x²", note: "Die 3 wandert vor das x. Der Exponent wird 2." },
@@ -86,69 +75,15 @@
                 { func: "f(x) = x⁵", deriv: "f'(x) = 5x⁴", note: "Das Muster bestätigt sich." }
             ];
 
-            // Data for Quiz
             const quizQuestions = [
-                {
-                    id: 1,
-                    question: "Basis: Leite ab: f(x) = x⁷",
-                    options: ["7x", "x⁶", "7x⁶", "6x⁷"],
-                    correct: 2,
-                    explanation: "Potenzregel: Exponent nach vorne, oben eins abziehen."
-                },
-                {
-                    id: 2,
-                    question: "Basis: Leite ab: f(x) = 3x⁴",
-                    options: ["12x³", "3x³", "4x³", "7x³"],
-                    correct: 0,
-                    explanation: "Faktorregel: 3 bleibt stehen. 3 · 4x³ = 12x³."
-                },
-                // --- NEUE AUFGABEN START ---
-                {
-                    id: 3,
-                    question: "Summenregel: f(x) = x² + x⁵",
-                    options: ["2x + 5x⁴", "x + x⁴", "2x⁵", "7x⁶"],
-                    correct: 0,
-                    explanation: "Summenregel: Du darfst beide Teile getrennt voneinander ableiten."
-                },
-                {
-                    id: 4,
-                    question: "Kombiniert: f(x) = 4x³ - 2x²",
-                    options: ["12x² - 2x", "12x² - 4x", "4x² - 2x", "7x²"],
-                    correct: 1,
-                    explanation: "Faktor- und Summenregel zusammen: 4·3x² ergibt 12x² und -2·2x ergibt -4x."
-                },
-                {
-                    id: 5,
-                    question: "Wichtig: f(x) = x⁶ + 100",
-                    hint: "Was ist die Steigung einer flachen Zahl (Konstante)?",
-                    options: ["6x⁵ + 100", "6x⁵ + 1", "6x⁵", "106x⁵"],
-                    correct: 2,
-                    explanation: "Die Ableitung einer reinen Zahl (Konstante) ist immer 0, da sie keine Steigung hat. Die 100 fällt weg!"
-                },
-                {
-                    id: 6,
-                    question: "Ganzrationale Funktion: f(x) = 2x² + 5x - 3",
-                    options: ["4x + 5", "4x + 5 - 3", "2x + 5", "4x"],
-                    correct: 0,
-                    explanation: "2x² wird 4x. 5x wird 5 (da x hoch 0 ist 1). Die -3 fällt weg."
-                },
-                // --- NEUE AUFGABEN ENDE ---
-                {
-                    id: 7,
-                    question: "Vorsicht Falle! f(x) = x² + 4a",
-                    hint: "a ist eine Zahl (Parameter), kein x!",
-                    options: ["2x + 4", "2x", "2x + 4a", "2x + a"],
-                    correct: 1,
-                    explanation: "Die Summenregel sagt: Einzeln ableiten. '4a' enthält kein x, ist also eine Konstante und fällt weg!"
-                },
-                {
-                    id: 8,
-                    question: "Aus dem Buch (S.89): f(a) = -a² + 7x³",
-                    hint: "Hier ist a die Variable, x ist nur eine Zahl!",
-                    options: ["-2a + 21x²", "-2a", "-2a + 7x³", "21x²"],
-                    correct: 1,
-                    explanation: "Da f(a) steht, leiten wir nach a ab. 7x³ ist also eine reine Zahl und fällt beim Ableiten weg!"
-                }
+                { id: 1, question: "Basis: Leite ab: f(x) = x⁷", options: ["7x", "x⁶", "7x⁶", "6x⁷"], correct: 2, explanation: "Potenzregel: Exponent nach vorne, oben eins abziehen." },
+                { id: 2, question: "Basis: Leite ab: f(x) = 3x⁴", options: ["12x³", "3x³", "4x³", "7x³"], correct: 0, explanation: "Faktorregel: 3 bleibt stehen. 3 · 4x³ = 12x³." },
+                { id: 3, question: "Summenregel: f(x) = x² + x⁵", options: ["2x + 5x⁴", "x + x⁴", "2x⁵", "7x⁶"], correct: 0, explanation: "Summenregel: Du darfst beide Teile getrennt voneinander ableiten." },
+                { id: 4, question: "Kombiniert: f(x) = 4x³ - 2x²", options: ["12x² - 2x", "12x² - 4x", "4x² - 2x", "7x²"], correct: 1, explanation: "Faktor- und Summenregel zusammen: 4·3x² ergibt 12x² und -2·2x ergibt -4x." },
+                { id: 5, question: "Wichtig: f(x) = x⁶ + 100", hint: "Was ist die Steigung einer flachen Zahl (Konstante)?", options: ["6x⁵ + 100", "6x⁵ + 1", "6x⁵", "106x⁵"], correct: 2, explanation: "Die Ableitung einer reinen Zahl (Konstante) ist immer 0, da sie keine Steigung hat. Die 100 fällt weg!" },
+                { id: 6, question: "Ganzrationale Funktion: f(x) = 2x² + 5x - 3", options: ["4x + 5", "4x + 5 - 3", "2x + 5", "4x"], correct: 0, explanation: "2x² wird 4x. 5x wird 5 (da x hoch 0 ist 1). Die -3 fällt weg." },
+                { id: 7, question: "Vorsicht Falle! f(x) = x² + 4a", hint: "a ist eine Zahl (Parameter), kein x!", options: ["2x + 4", "2x", "2x + 4a", "2x + a"], correct: 1, explanation: "Die Summenregel sagt: Einzeln ableiten. '4a' enthält kein x, ist also eine Konstante und fällt weg!" },
+                { id: 8, question: "Aus dem Buch (S.89): f(a) = -a² + 7x³", hint: "Hier ist a die Variable, x ist nur eine Zahl!", options: ["-2a + 21x²", "-2a", "-2a + 7x³", "21x²"], correct: 1, explanation: "Da f(a) steht, leiten wir nach a ab. 7x³ ist also eine reine Zahl und fällt beim Ableiten weg!" }
             ];
 
             const toggleRow = (index) => {
@@ -158,8 +93,7 @@
             };
 
             const handleQuizAnswer = (qId, optionIndex) => {
-                if (quizAnswers[qId] !== undefined) return; // Already answered
-
+                if (quizAnswers[qId] !== undefined) return; 
                 const isCorrect = quizQuestions.find(q => q.id === qId).correct === optionIndex;
                 setQuizAnswers({ ...quizAnswers, [qId]: optionIndex });
                 if (isCorrect) setQuizScore(quizScore + 1);
@@ -167,337 +101,161 @@
 
             return (
                 <div className="min-h-screen bg-slate-50 text-slate-800 pb-12">
-                
-                {/* Header */}
-                <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-                    <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        Mathe Entdecker: Ableitungen
-                    </h1>
-                    <div className="flex space-x-1">
-                        {tabs.map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                            activeTab === tab.id 
-                                ? 'bg-blue-100 text-blue-700' 
-                                : 'text-slate-500 hover:bg-slate-100'
-                            }`}
-                        >
-                            <span className="hidden sm:inline">{tab.icon}</span>
-                            <span className="sm:hidden">{tab.icon}</span>
-                            <span className="hidden sm:inline">{tab.label}</span>
-                        </button>
-                        ))}
-                    </div>
-                    </div>
-                </header>
-
-                <main className="max-w-3xl mx-auto px-4 py-8">
-                    
-                    {/* SECTION 1: INTRO */}
-                    {activeTab === 'intro' && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
-                        <div className="inline-block p-3 bg-blue-100 text-blue-600 rounded-full mb-4">
-                            <Search size={32} />
-                        </div>
-                        <h2 className="text-2xl font-bold mb-4">Das Problem mit der h-Methode</h2>
-                        <p className="text-lg text-slate-600 mb-6">
-                            Bisher haben wir Steigungen mühsam mit dem Differenzenquotienten berechnet:
-                        </p>
-                        
-                        {/* Formel mit korrektem Bruchstrich */}
-                        <div className="flex items-center justify-center text-xl font-serif mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100 inline-flex mx-auto">
-                            <span className="mr-4 italic text-slate-500">f'(x) = <span className="text-base">lim</span><sub className="text-xs">h→0</sub></span>
-                            <div className="flex flex-col items-center">
-                            <div className="border-b-2 border-slate-800 px-3 pb-1 font-medium">f(x+h) - f(x)</div>
-                            <div className="pt-1 font-medium">h</div>
-                            </div>
-                        </div>
-
-                        <p className="text-slate-600 mb-6 text-left">
-                            Stell dir vor, du sollst damit <strong className="text-blue-600">f(x) = x⁵</strong> ableiten. <br/>
-                            Schau dir an, was passiert:
-                        </p>
-
-                        {/* Step-by-Step Example Container */}
-                        <div className="bg-slate-900 text-slate-200 rounded-xl p-5 text-left font-mono text-xs sm:text-sm overflow-x-auto shadow-inner mb-8">
-                            
-                            <div className="mb-4">
-                            <p className="text-slate-500 mb-1">// 1. Einsetzen in die Formel:</p>
-                            <div className="flex items-center">
-                                <span className="mr-2 text-slate-400">lim...</span>
-                                <div className="flex flex-col items-center inline-flex">
-                                <div className="border-b border-slate-500 px-1">(x+h)⁵ - x⁵</div>
-                                <div>h</div>
-                                </div>
-                            </div>
-                            </div>
-
-                            <div className="mb-4">
-                            <p className="text-slate-500 mb-1">// 2. Ausmultiplizieren (Das Chaos beginnt 🤯):</p>
-                            <div className="text-red-300 whitespace-nowrap pb-2">
-                                (x⁵ + 5x⁴h + 10x³h² + 10x²h³ + 5xh⁴ + h⁵) - x⁵
-                            </div>
-                            <p className="text-slate-500 italic text-xs">↑ Stell dir diese Zeile bei x¹⁰⁰ vor!</p>
-                            </div>
-
-                            <div className="mb-4">
-                            <p className="text-slate-500 mb-1">// 3. Zusammenfassen & Kürzen:</p>
-                            <div className="whitespace-nowrap">
-                                5x⁴ + 10x³h + 10x²h² + 5xh³ + h⁴
-                            </div>
-                            </div>
-
-                            <div className="mb-2">
-                            <p className="text-slate-500 mb-1">// 4. Grenzwert h→0:</p>
-                            <div className="text-green-400 font-bold text-base">
-                                5x⁴ <span className="text-slate-600 font-normal text-sm">+ 0 + 0 + 0 + 0</span>
-                            </div>
-                            </div>
-                        </div>
-
-                        <p className="font-medium text-slate-800 mb-6">
-                            Mathematiker sind faul. Sie wollen diesen Rechenweg nicht jedes Mal machen. <br/>
-                            Wir suchen eine Abkürzung!
-                        </p>
-
-                        <button 
-                            onClick={() => setActiveTab('discovery')}
-                            className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors inline-flex items-center shadow-lg shadow-blue-200"
-                        >
-                            Muster entdecken <ArrowRight className="ml-2" size={18} />
-                        </button>
-                        </div>
-                    </div>
-                    )}
-
-                    {/* SECTION 2: DISCOVERY */}
-                    {activeTab === 'discovery' && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h2 className="text-xl font-bold mb-2">Forschungsphase</h2>
-                        <p className="text-slate-600 mb-6">Wir haben die h-Methode für die ersten Funktionen schon gemacht. Klicke auf "Aufdecken", um das Ergebnis zu sehen. Erkennst du die Regel?</p>
-
-                        <div className="space-y-3">
-                            {discoveryData.map((row, idx) => (
-                            <div key={idx} className="flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <div className="font-mono text-lg font-bold w-1/3">{row.func}</div>
-                                <div className="flex-1 flex justify-center">
-                                {revealedRows.includes(idx) ? (
-                                    <div className="text-blue-600 font-mono text-lg font-bold animate-in zoom-in">
-                                    {row.deriv}
-                                    </div>
-                                ) : (
-                                    <button 
-                                    onClick={() => toggleRow(idx)}
-                                    className="px-4 py-2 bg-slate-200 text-slate-600 rounded-md text-sm hover:bg-slate-300 transition-colors"
-                                    >
-                                    Aufdecken
+                    <header className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+                        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+                            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Mathe Entdecker: Ableitungen</h1>
+                            <div className="flex space-x-1">
+                                {tabs.map(tab => (
+                                    <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-blue-100 text-blue-700' : 'text-slate-500 hover:bg-slate-100'}`}>
+                                        <span className="hidden sm:inline">{tab.icon}</span>
+                                        <span className="sm:hidden">{tab.icon}</span>
+                                        <span className="hidden sm:inline">{tab.label}</span>
                                     </button>
-                                )}
+                                ))}
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-3xl mx-auto px-4 py-8">
+                        {/* INTRO */}
+                        {activeTab === 'intro' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+                                    <div className="inline-block p-3 bg-blue-100 text-blue-600 rounded-full mb-4"><Search size={32} /></div>
+                                    <h2 className="text-2xl font-bold mb-4">Das Problem mit der h-Methode</h2>
+                                    <p className="text-lg text-slate-600 mb-6">Bisher haben wir Steigungen mühsam mit dem Differenzenquotienten berechnet:</p>
+                                    
+                                    <div className="flex items-center justify-center text-xl font-serif mb-8 bg-slate-50 p-4 rounded-xl border border-slate-100 inline-flex mx-auto">
+                                        <span className="mr-4 italic text-slate-500">f'(x) = <span className="text-base">lim</span><sub className="text-xs">h→0</sub></span>
+                                        <div className="flex flex-col items-center">
+                                            <div className="border-b-2 border-slate-800 px-3 pb-1 font-medium">f(x+h) - f(x)</div>
+                                            <div className="pt-1 font-medium">h</div>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-slate-600 mb-6 text-left">Stell dir vor, du sollst damit <strong className="text-blue-600">f(x) = x⁵</strong> ableiten. Schau dir an, was passiert:</p>
+
+                                    <div className="bg-slate-900 text-slate-200 rounded-xl p-5 text-left font-mono text-xs sm:text-sm overflow-x-auto shadow-inner mb-8">
+                                        <div className="mb-4"><p className="text-slate-500 mb-1">// 1. Einsetzen in die Formel:</p><div className="flex items-center"><span className="mr-2 text-slate-400">lim...</span><div className="flex flex-col items-center inline-flex"><div className="border-b border-slate-500 px-1">(x+h)⁵ - x⁵</div><div>h</div></div></div></div>
+                                        <div className="mb-4"><p className="text-slate-500 mb-1">// 2. Ausmultiplizieren (Das Chaos beginnt 🤯):</p><div className="text-red-300 whitespace-nowrap pb-2">(x⁵ + 5x⁴h + 10x³h² + 10x²h³ + 5xh⁴ + h⁵) - x⁵</div><p className="text-slate-500 italic text-xs">↑ Stell dir diese Zeile bei x¹⁰⁰ vor!</p></div>
+                                        <div className="mb-4"><p className="text-slate-500 mb-1">// 3. Zusammenfassen & Kürzen:</p><div className="whitespace-nowrap">5x⁴ + 10x³h + 10x²h² + 5xh³ + h⁴</div></div>
+                                        <div className="mb-2"><p className="text-slate-500 mb-1">// 4. Grenzwert h→0:</p><div className="text-green-400 font-bold text-base">5x⁴ <span className="text-slate-600 font-normal text-sm">+ 0 + 0 + 0 + 0</span></div></div>
+                                    </div>
+
+                                    <p className="font-medium text-slate-800 mb-6">Mathematiker sind faul. Sie suchen eine Abkürzung!</p>
+                                    <button onClick={() => setActiveTab('discovery')} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors inline-flex items-center shadow-lg shadow-blue-200">Muster entdecken <ArrowRight className="ml-2" size={18} /></button>
                                 </div>
                             </div>
-                            ))}
-                        </div>
-
-                        {revealedRows.length >= 3 && (
-                            <div className="mt-8 bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-                            <h3 className="font-bold text-indigo-900 mb-3">Deine Vermutung:</h3>
-                            <p className="mb-4 text-sm text-indigo-800">Wenn f(x) = xⁿ ist, wie lautet dann die Ableitung f'(x)?</p>
-                            
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <button 
-                                onClick={() => setDiscoveryGuess('wrong1')}
-                                className={`p-3 rounded-lg border text-sm font-medium transition-all ${discoveryGuess === 'wrong1' ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-indigo-200 hover:bg-indigo-100'}`}
-                                >
-                                f'(x) = xⁿ⁻¹
-                                </button>
-                                <button 
-                                onClick={() => setDiscoveryGuess('correct')}
-                                className={`p-3 rounded-lg border text-sm font-medium transition-all ${discoveryGuess === 'correct' ? 'bg-green-100 border-green-300 text-green-800' : 'bg-white border-indigo-200 hover:bg-indigo-100'}`}
-                                >
-                                f'(x) = n · xⁿ⁻¹
-                                </button>
-                                <button 
-                                onClick={() => setDiscoveryGuess('wrong2')}
-                                className={`p-3 rounded-lg border text-sm font-medium transition-all ${discoveryGuess === 'wrong2' ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-indigo-200 hover:bg-indigo-100'}`}
-                                >
-                                f'(x) = n · xⁿ
-                                </button>
-                            </div>
-
-                            {discoveryGuess === 'correct' && (
-                                <div className="mt-4 flex items-start text-green-700 text-sm">
-                                <Check className="mr-2 mt-0.5 flex-shrink-0" size={16} />
-                                <p><strong>Perfekt!</strong> Der alte Exponent wandert nach vorne als Faktor, und oben wird einer abgezogen.</p>
-                                </div>
-                            )}
-                            </div>
                         )}
-                        </div>
-                        {discoveryGuess === 'correct' && (
-                        <div className="flex justify-end">
-                            <button 
-                                onClick={() => setActiveTab('rules')}
-                                className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors inline-flex items-center"
-                            >
-                                Zu den Regeln <ChevronRight className="ml-2" size={18} />
-                            </button>
-                        </div>
-                        )}
-                    </div>
-                    )}
 
-                    {/* SECTION 3: RULES */}
-                    {activeTab === 'rules' && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                        <h2 className="text-xl font-bold mb-6 flex items-center">
-                            <BookOpen className="mr-2 text-blue-600" /> Der "Spickzettel"
-                        </h2>
+                        {/* DISCOVERY */}
+                        {activeTab === 'discovery' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                    <h2 className="text-xl font-bold mb-2">Forschungsphase</h2>
+                                    <p className="text-slate-600 mb-6">Wir haben die h-Methode für die ersten Funktionen schon gemacht. Klicke auf "Aufdecken", um das Ergebnis zu sehen. Erkennst du die Regel?</p>
 
-                        <div className="grid gap-6 md:grid-cols-2">
-                            {/* Rule 1 */}
-                            <div className="bg-orange-50 p-5 rounded-xl border border-orange-100 relative overflow-hidden group hover:shadow-md transition-shadow">
-                            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20">
-                                <Brain size={64} />
-                            </div>
-                            <h3 className="font-bold text-orange-900 mb-2">1. Die Potenzregel</h3>
-                            <div className="bg-white/80 p-3 rounded-lg font-mono text-center mb-3 text-orange-800 border border-orange-200">
-                                f(x) = xⁿ  ➞  f'(x) = n · xⁿ⁻¹
-                            </div>
-                            <p className="text-sm text-orange-800">
-                                Hol die Hochzahl nach vorne. Mach die neue Hochzahl um 1 kleiner.
-                            </p>
-                            </div>
+                                    <div className="space-y-3">
+                                        {discoveryData.map((row, idx) => (
+                                            <div key={idx} className="flex items-center justify-between bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                                <div className="font-mono text-lg font-bold w-1/3">{row.func}</div>
+                                                <div className="flex-1 flex justify-center">
+                                                    {revealedRows.includes(idx) ? (
+                                                        <div className="text-blue-600 font-mono text-lg font-bold animate-in zoom-in">{row.deriv}</div>
+                                                    ) : (
+                                                        <button onClick={() => toggleRow(idx)} className="px-4 py-2 bg-slate-200 text-slate-600 rounded-md text-sm hover:bg-slate-300 transition-colors">Aufdecken</button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
 
-                            {/* Rule 2 */}
-                            <div className="bg-emerald-50 p-5 rounded-xl border border-emerald-100 relative overflow-hidden group hover:shadow-md transition-shadow">
-                            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20">
-                                <Calculator size={64} />
-                            </div>
-                            <h3 className="font-bold text-emerald-900 mb-2">2. Die Faktorregel</h3>
-                            <div className="bg-white/80 p-3 rounded-lg font-mono text-center mb-3 text-emerald-800 border border-emerald-200">
-                                f(x) = c · g(x) ➞ f'(x) = c · g'(x)
-                            </div>
-                            <p className="text-sm text-emerald-800">
-                                Zahlen, die mit "mal" davorstehen, bleiben einfach stehen.
-                            </p>
-                            </div>
-
-                            {/* Rule 3 */}
-                            <div className="bg-blue-50 p-5 rounded-xl border border-blue-100 col-span-1 md:col-span-2 relative overflow-hidden group hover:shadow-md transition-shadow">
-                            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20">
-                                <BookOpen size={64} />
-                            </div>
-                            <h3 className="font-bold text-blue-900 mb-2">3. Die Summenregel</h3>
-                            <div className="bg-white/80 p-3 rounded-lg font-mono text-center mb-3 text-blue-800 border border-blue-200">
-                                f(x) = g(x) + h(x) ➞ f'(x) = g'(x) + h'(x)
-                            </div>
-                            <p className="text-sm text-blue-800">
-                                Bei "Plus" und "Minus" darfst du jeden Teil für sich alleine ableiten.
-                            </p>
-                            </div>
-                        </div>
-                        
-                        <div className="mt-8 text-center">
-                            <p className="text-slate-600 mb-4">Verstanden? Dann lass uns Fallen suchen!</p>
-                            <button 
-                            onClick={() => setActiveTab('practice')}
-                            className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors inline-flex items-center"
-                            >
-                            Zum Training <ChevronRight className="ml-2" size={18} />
-                            </button>
-                        </div>
-                        </div>
-                    </div>
-                    )}
-
-                    {/* SECTION 4: PRACTICE */}
-                    {activeTab === 'practice' && (
-                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                        <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold">Kärtchen-Training</h2>
-                        <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
-                            Punkte: {quizScore} / {quizQuestions.length}
-                        </div>
-                        </div>
-                        
-                        <p className="text-slate-600">
-                        Hier sind Aufgaben ähnlich wie im Buch (S. 88/89). Vorsicht: Manche sind Fallen!
-                        </p>
-
-                        <div className="grid gap-6 md:grid-cols-1">
-                        {quizQuestions.map((q, qIndex) => {
-                            const isAnswered = quizAnswers[q.id] !== undefined;
-                            const userAnswer = quizAnswers[q.id];
-                            const isCorrect = userAnswer === q.correct;
-
-                            return (
-                            <div key={q.id} className={`bg-white rounded-xl shadow-sm border-2 overflow-hidden transition-all ${isAnswered ? (isCorrect ? 'border-green-200' : 'border-red-200') : 'border-slate-100'}`}>
-                                <div className="p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="font-mono text-lg font-bold bg-slate-100 px-3 py-1 rounded text-slate-700">
-                                    {q.question}
-                                    </h3>
-                                    {isAnswered && (
-                                    isCorrect 
-                                        ? <span className="text-green-600 bg-green-50 px-2 py-1 rounded text-sm font-bold flex items-center"><Check size={14} className="mr-1"/> Richtig</span>
-                                        : <span className="text-red-600 bg-red-50 px-2 py-1 rounded text-sm font-bold flex items-center"><XIcon size={14} className="mr-1"/> Falsch</span>
+                                    {revealedRows.length >= 3 && (
+                                        <div className="mt-8 bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+                                            <h3 className="font-bold text-indigo-900 mb-3">Deine Vermutung:</h3>
+                                            <p className="mb-4 text-sm text-indigo-800">Wenn f(x) = xⁿ ist, wie lautet dann die Ableitung f'(x)?</p>
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                                <button onClick={() => setDiscoveryGuess('wrong1')} className={`p-3 rounded-lg border text-sm font-medium transition-all ${discoveryGuess === 'wrong1' ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-indigo-200 hover:bg-indigo-100'}`}>f'(x) = xⁿ⁻¹</button>
+                                                <button onClick={() => setDiscoveryGuess('correct')} className={`p-3 rounded-lg border text-sm font-medium transition-all ${discoveryGuess === 'correct' ? 'bg-green-100 border-green-300 text-green-800' : 'bg-white border-indigo-200 hover:bg-indigo-100'}`}>f'(x) = n · xⁿ⁻¹</button>
+                                                <button onClick={() => setDiscoveryGuess('wrong2')} className={`p-3 rounded-lg border text-sm font-medium transition-all ${discoveryGuess === 'wrong2' ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-indigo-200 hover:bg-indigo-100'}`}>f'(x) = n · xⁿ</button>
+                                            </div>
+                                            {discoveryGuess === 'correct' && (
+                                                <div className="mt-4 flex items-start text-green-700 text-sm"><Check className="mr-2 mt-0.5 flex-shrink-0" size={16} /><p><strong>Perfekt!</strong> Der alte Exponent wandert nach vorne als Faktor, und oben wird einer abgezogen.</p></div>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                                
-                                {q.hint && !isAnswered && (
-                                    <div className="mb-4 text-sm text-amber-600 bg-amber-50 p-2 rounded flex items-center">
-                                    <Brain size={14} className="mr-2" /> Tipp: {q.hint}
-                                    </div>
+                                {discoveryGuess === 'correct' && (
+                                    <div className="flex justify-end"><button onClick={() => setActiveTab('rules')} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors inline-flex items-center">Zu den Regeln <ChevronRight className="ml-2" size={18} /></button></div>
                                 )}
+                            </div>
+                        )}
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {q.options.map((opt, optIndex) => (
-                                    <button
-                                        key={optIndex}
-                                        disabled={isAnswered}
-                                        onClick={() => handleQuizAnswer(q.id, optIndex)}
-                                        className={`p-3 rounded-lg text-left font-mono text-sm transition-all border
-                                        ${isAnswered 
-                                            ? (optIndex === q.correct 
-                                                ? 'bg-green-100 border-green-500 text-green-900 font-bold' 
-                                                : (optIndex === userAnswer ? 'bg-red-100 border-red-500 text-red-900' : 'opacity-50 border-slate-200'))
-                                            : 'hover:bg-blue-50 hover:border-blue-300 border-slate-200 bg-slate-50'
-                                        }
-                                        `}
-                                    >
-                                        {opt}
-                                    </button>
-                                    ))}
-                                </div>
-
-                                {isAnswered && (
-                                    <div className={`mt-4 text-sm p-3 rounded-lg ${isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-                                    <strong>Erklärung:</strong> {q.explanation}
+                        {/* RULES */}
+                        {activeTab === 'rules' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                                    <h2 className="text-xl font-bold mb-6 flex items-center"><BookOpen className="mr-2 text-blue-600" /> Der "Spickzettel"</h2>
+                                    <div className="grid gap-6 md:grid-cols-2">
+                                        <div className="bg-orange-50 p-5 rounded-xl border border-orange-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+                                            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20"><Brain size={64} /></div>
+                                            <h3 className="font-bold text-orange-900 mb-2">1. Die Potenzregel</h3>
+                                            <div className="bg-white/80 p-3 rounded-lg font-mono text-center mb-3 text-orange-800 border border-orange-200">f(x) = xⁿ  ➞  f'(x) = n · xⁿ⁻¹</div>
+                                            <p className="text-sm text-orange-800">Hol die Hochzahl nach vorne. Mach die neue Hochzahl um 1 kleiner.</p>
+                                        </div>
+                                        <div className="bg-emerald-50 p-5 rounded-xl border border-emerald-100 relative overflow-hidden group hover:shadow-md transition-shadow">
+                                            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20"><Calculator size={64} /></div>
+                                            <h3 className="font-bold text-emerald-900 mb-2">2. Die Faktorregel</h3>
+                                            <div className="bg-white/80 p-3 rounded-lg font-mono text-center mb-3 text-emerald-800 border border-emerald-200">f(x) = c · g(x) ➞ f'(x) = c · g'(x)</div>
+                                            <p className="text-sm text-emerald-800">Zahlen, die mit "mal" davorstehen, bleiben einfach stehen.</p>
+                                        </div>
+                                        <div className="bg-blue-50 p-5 rounded-xl border border-blue-100 col-span-1 md:col-span-2 relative overflow-hidden group hover:shadow-md transition-shadow">
+                                            <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20"><BookOpen size={64} /></div>
+                                            <h3 className="font-bold text-blue-900 mb-2">3. Die Summenregel</h3>
+                                            <div className="bg-white/80 p-3 rounded-lg font-mono text-center mb-3 text-blue-800 border border-blue-200">f(x) = g(x) + h(x) ➞ f'(x) = g'(x) + h'(x)</div>
+                                            <p className="text-sm text-blue-800">Bei "Plus" und "Minus" darfst du jeden Teil für sich alleine ableiten.</p>
+                                        </div>
                                     </div>
-                                )}
+                                    <div className="mt-8 text-center"><p className="text-slate-600 mb-4">Verstanden? Dann lass uns Fallen suchen!</p><button onClick={() => setActiveTab('practice')} className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors inline-flex items-center">Zum Training <ChevronRight className="ml-2" size={18} /></button></div>
                                 </div>
                             </div>
-                            );
-                        })}
-                        </div>
-
-                        {Object.keys(quizAnswers).length === quizQuestions.length && (
-                        <div className="bg-slate-800 text-white p-6 rounded-2xl text-center mt-8 animate-in zoom-in">
-                            <h3 className="text-2xl font-bold mb-2">Training abgeschlossen!</h3>
-                            <p className="mb-6 opacity-90">Du hast {quizScore} von {quizQuestions.length} Aufgaben richtig.</p>
-                            <p className="text-sm text-slate-400">Öffne jetzt dein Buch auf Seite 89 und versuche Aufgabe 3 und 4!</p>
-                        </div>
                         )}
-                    </div>
-                    )}
 
-                </main>
+                        {/* PRACTICE */}
+                        {activeTab === 'practice' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="flex items-center justify-between"><h2 className="text-xl font-bold">Kärtchen-Training</h2><div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">Punkte: {quizScore} / {quizQuestions.length}</div></div>
+                                <p className="text-slate-600">Hier sind Aufgaben ähnlich wie im Buch (S. 88/89). Vorsicht: Manche sind Fallen!</p>
+                                <div className="grid gap-6 md:grid-cols-1">
+                                    {quizQuestions.map((q, qIndex) => {
+                                        const isAnswered = quizAnswers[q.id] !== undefined;
+                                        const userAnswer = quizAnswers[q.id];
+                                        const isCorrect = userAnswer === q.correct;
+                                        return (
+                                            <div key={q.id} className={`bg-white rounded-xl shadow-sm border-2 overflow-hidden transition-all ${isAnswered ? (isCorrect ? 'border-green-200' : 'border-red-200') : 'border-slate-100'}`}>
+                                                <div className="p-6">
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <h3 className="font-mono text-lg font-bold bg-slate-100 px-3 py-1 rounded text-slate-700">{q.question}</h3>
+                                                        {isAnswered && (isCorrect ? <span className="text-green-600 bg-green-50 px-2 py-1 rounded text-sm font-bold flex items-center"><Check size={14} className="mr-1"/> Richtig</span> : <span className="text-red-600 bg-red-50 px-2 py-1 rounded text-sm font-bold flex items-center"><XIcon size={14} className="mr-1"/> Falsch</span>)}
+                                                    </div>
+                                                    {q.hint && !isAnswered && (<div className="mb-4 text-sm text-amber-600 bg-amber-50 p-2 rounded flex items-center"><Brain size={14} className="mr-2" /> Tipp: {q.hint}</div>)}
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                        {q.options.map((opt, optIndex) => (
+                                                            <button key={optIndex} disabled={isAnswered} onClick={() => handleQuizAnswer(q.id, optIndex)} className={`p-3 rounded-lg text-left font-mono text-sm transition-all border ${isAnswered ? (optIndex === q.correct ? 'bg-green-100 border-green-500 text-green-900 font-bold' : (optIndex === userAnswer ? 'bg-red-100 border-red-500 text-red-900' : 'opacity-50 border-slate-200')) : 'hover:bg-blue-50 hover:border-blue-300 border-slate-200 bg-slate-50'}`}>{opt}</button>
+                                                        ))}
+                                                    </div>
+                                                    {isAnswered && (<div className={`mt-4 text-sm p-3 rounded-lg ${isCorrect ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}><strong>Erklärung:</strong> {q.explanation}</div>)}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                                {Object.keys(quizAnswers).length === quizQuestions.length && (
+                                    <div className="bg-slate-800 text-white p-6 rounded-2xl text-center mt-8 animate-in zoom-in"><h3 className="text-2xl font-bold mb-2">Training abgeschlossen!</h3><p className="mb-6 opacity-90">Du hast {quizScore} von {quizQuestions.length} Aufgaben richtig.</p><p className="text-sm text-slate-400">Öffne jetzt dein Buch auf Seite 89 und versuche Aufgabe 3 und 4!</p></div>
+                                )}
+                            </div>
+                        )}
+                    </main>
                 </div>
             );
         };
